@@ -30,6 +30,15 @@ pub struct PerceptConfig {
     pub onset_local_win_s: f64,
     /// 呼吸：能量至少高于底噪多少 dB。
     pub breath_min_above_floor_db: f64,
+    /// 呼吸：相对邻域峰值的能量凹陷深度（dB）。
+    ///
+    /// 为什么需要这个：原先只用「非浊音帧」当候选，这在自研 f0 上够用
+    /// （浊音率 87%），换成 RMVPE 后浊音率涨到 96.8%，几乎不再有非浊音帧，
+    /// 呼吸数从 17.97 次/分直接掉到 1.37。真人换气发生在音符之间——
+    /// 能量比邻域低十几 dB，但仍明显高于底噪，靠能量凹陷识别才不依赖 voicing。
+    pub breath_dip_db: f64,
+    /// 凹陷判据的邻域半宽（帧数）。15 帧 × 10ms = 前后各 150ms。
+    pub breath_dip_half_win: usize,
     /// 呼吸：频谱重心下限 / 上限（Hz）。
     pub breath_centroid_lo_hz: f64,
     pub breath_centroid_hi_hz: f64,
@@ -48,6 +57,8 @@ impl Default for PerceptConfig {
             onset_min_gap_s: 0.05,
             onset_local_win_s: 0.30,
             breath_min_above_floor_db: 6.0,
+            breath_dip_db: 12.0,
+            breath_dip_half_win: 15,
             breath_centroid_lo_hz: 2000.0,
             breath_centroid_hi_hz: 6000.0,
             breath_min_dur_s: 0.08,
@@ -282,10 +293,30 @@ pub fn detect_breaths(buf: &AudioBuffer, track: &F0Track, cfg: &PerceptConfig) -
     let mut run_start: Option<usize> = None;
     let mut considered = 0usize;
 
-    for k in 0..track.total_frames {
+    // 先把逐帧能量算出来——凹陷判据要看邻域，逐帧算两遍没必要。
+    let n_frames = track.total_frames;
+    let frame_energy: Vec<f64> = (0..n_frames).map(energy_db).collect();
+    // 邻域峰值：前后各 half 帧的最大能量。呼吸夹在音符之间，
+    // 邻域里一定有更响的音符，所以「比邻域峰值低 12dB」是个稳定的判据。
+    let half = cfg.breath_dip_half_win.max(1);
+    let local_max: Vec<f64> = (0..n_frames)
+        .map(|k| {
+            let lo = k.saturating_sub(half);
+            let hi = (k + half + 1).min(n_frames);
+            frame_energy[lo..hi]
+                .iter()
+                .fold(f64::NEG_INFINITY, |a, &b| if b > a { b } else { a })
+        })
+        .collect();
+
+    for k in 0..n_frames {
         let is_unvoiced = !track.voicing.get(k).copied().unwrap_or(false);
-        let loud_enough = energy_db(k) > floor_db + cfg.breath_min_above_floor_db;
-        let candidate = is_unvoiced && loud_enough;
+        let loud_enough = frame_energy[k] > floor_db + cfg.breath_min_above_floor_db;
+        // 两条路径任一成立即可：
+        //   1) 非浊音帧——自研 f0 的常规情况（浊音率 87%）
+        //   2) 能量凹陷 —— RMVPE 浊音率 96.8% 时唯一可行的信号
+        let dip = frame_energy[k] < local_max[k] - cfg.breath_dip_db;
+        let candidate = loud_enough && (is_unvoiced || dip);
         voiced_or_not.push(candidate);
         if candidate {
             considered += 1;
