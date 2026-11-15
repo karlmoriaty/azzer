@@ -1,0 +1,314 @@
+/* Azzer 设计 tokens —— 见 docs/Azzer-tech-stack-v3.2.md §6.2
+   暗色克制 + 暖石/青绿双强调 + 波形为主视觉 */
+
+:root {
+  /* 表面（三层） */
+  --bg-base: #0c0c0d;
+  --bg-surface: #141416;
+  --bg-elevated: #1c1c1f;
+  --bg-hover: #232327;
+  --bg-active: #2a2a2f;
+
+  /* 文字（三级） */
+  --text-primary: #ededef;
+  --text-secondary: #a1a1a6;
+  --text-tertiary: #6e6e76;
+
+  /* 强调 */
+  --accent-warm: #e8b27d;
+  --accent-cool: #5ec8b0;
+  --accent-danger: #e06c5a;
+
+  /* 边框 */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
+
+  /* 排版 */
+  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system,
+    sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  /* 间距（4 的倍数） */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s8: 32px;
+  --s10: 40px;
+
+  /* 圆角 */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-pill: 999px;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 布局 ---------- */
+
+.app {
+  display: grid;
+  grid-template-columns: 220px 1fr 280px;
+  grid-template-rows: 40px 1fr;
+  height: 100%;
+}
+
+.topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding: 0 var(--s4);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.brand {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.brand-sub {
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+
+.status {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+}
+
+.dot.ok {
+  background: var(--accent-cool);
+}
+
+.dot.warn {
+  background: var(--accent-warm);
+}
+
+.dot.err {
+  background: var(--accent-danger);
+}
+
+.sidebar {
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  padding: var(--s3);
+  overflow-y: auto;
+}
+
+.sidebar h2 {
+  margin: 0 0 var(--s3);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.task {
+  padding: var(--s2) var(--s3);
+  border-radius: var(--r-sm);
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.task:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.task.active {
+  background: var(--bg-active);
+  color: var(--text-primary);
+}
+
+.task .name {
+  display: block;
+}
+
+.task .meta {
+  display: block;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.main {
+  padding: var(--s5);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+
+.inspector {
+  border-left: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  padding: var(--s3);
+  overflow-y: auto;
+}
+
+.inspector h2 {
+  margin: 0 0 var(--s3);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.field {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: var(--s1) 0;
+  color: var(--text-secondary);
+}
+
+.field .v {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.hint {
+  color: var(--text-tertiary);
+  font-size: 11px;
+  line-height: 1.5;
+  margin-top: var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ---------- 波形卡片 ---------- */
+
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  padding: var(--s4);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  margin-bottom: var(--s3);
+}
+
+.panel-title {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+}
+
+.tag.warm {
+  color: var(--accent-warm);
+  border-color: color-mix(in oklab, var(--accent-warm) 40%, transparent);
+}
+
+.tag.cool {
+  color: var(--accent-cool);
+  border-color: color-mix(in oklab, var(--accent-cool) 40%, transparent);
+}
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  margin-top: var(--s3);
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.play {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+  color: var(--text-primary);
+}
+
+.play:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-tertiary);
+}
+
+.timecode {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+}
+
+kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  color: var(--text-tertiary);
+}
+
+.empty {
+  color: var(--text-tertiary);
+  line-height: 1.7;
+  padding: var(--s6) 0;
+}

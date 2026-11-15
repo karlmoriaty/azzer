@@ -1,0 +1,29 @@
+{
+  "_说明": "这是模板，不是声明文件。Azzer 只读取运行根目录下的 models.json，不会读取本文件。复制过去后按自己的路径填写即可；不创建也完全正常，此时走 A 入口同音色直通。",
+  "_规则": "软件不内置、不下载、不托管任何模型；只读你在这里声明的路径。文件不存在是正常状态，对应能力自动隐藏，不会报错。",
+  "_路径": "path 用绝对路径。放在工作目录内最省事；放别的盘也可以，但 FAT32 分区单文件不能超过 4 GB。",
+  "_示例已实测": "下面三条是 2026-11-14 实际下载并验证过的模型（HF 镜像）。位置是开发工作区，路径按你自己的放法改。",
+  "models": [
+    {
+      "id": "mdx-voc-ft",
+      "role": "separation",
+      "path": "<工作目录>/.cache/models/mdxnet/UVR-MDX-NET-Voc_FT.onnx",
+      "engine": "onnx-local",
+      "note": "MDX-Net 人声分离。输入/输出均为 float32 [B,4,3072,256]；n_fft=6144 hop=1024 dim_f=3072 dim_t=256；只吃 44.1kHz"
+    },
+    {
+      "id": "mdx-inst-hq3",
+      "role": "separation",
+      "path": "<工作目录>/.cache/models/mdxnet/UVR-MDX-NET-Inst_HQ_3.onnx",
+      "engine": "onnx-local",
+      "note": "MDX-Net 伴奏分离。与上一条同架构，用于交叉校验分离质量"
+    },
+    {
+      "id": "rmvpe",
+      "role": "f0",
+      "path": "<工作目录>/.cache/models/rmvpe/rmvpe.onnx",
+      "engine": "onnx-local",
+      "note": "RMVPE 基频提取。比内置的 YIN + 归一化自相关双路更准，但不是必需——不声明就用内置算法"
+    }
+  ]
+}

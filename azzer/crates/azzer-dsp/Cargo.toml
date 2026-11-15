@@ -1,0 +1,13 @@
+[package]
+name = "azzer-dsp"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+azzer-core = { path = "../azzer-core" }
+serde.workspace = true
+thiserror.workspace = true
+hound = "3"
+rustfft.workspace = true

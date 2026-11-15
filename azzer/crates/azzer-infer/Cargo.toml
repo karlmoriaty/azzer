@@ -1,0 +1,38 @@
+[package]
+name = "azzer-infer"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[features]
+# default 开 cuda：本机的 CUDA 运行库由 scripts/fetch-cuda.ps1 绿色部署到
+# native/cuda/bin，运行时把该目录前置到进程 PATH，不改系统环境变量。
+# directml 保留，但当前不可用（onnxruntime-directml 停在 1.24.4，
+# 与 ort rc.15 要求的 >= 1.31 不兼容）。
+default = ["cuda"]
+cuda = ["ort/cuda"]
+directml = ["ort/directml"]
+
+[dependencies]
+azzer-core = { path = "../azzer-core" }
+# 版本选择的来龙去脉（2026-11-08 实测 + 官方文档核对）：
+#   - ort rc.15 要求 ONNX Runtime >= 1.31
+#   - ORT 1.30/1.31 的 CUDA EP 只支持 CUDA 13（要找 cublasLt64_13.dll）
+#   - NVIDIA 尚未在 pip 发布 cu13 的 cublas/cudart/cufft（只有 0.0.1 占位）
+#   - 官方文档：从 1.27 起 PyPI 的 GPU 包默认 CUDA 13，只有 1.26 及更早是 CUDA 12.8
+#   所以选 ORT 1.26（cu12.8）+ 与之匹配的 ort rc.9，走 CUDA 12。
+#
+# load-dynamic：编译期不下载 onnxruntime 二进制（本机访问 GitHub 不可达，
+# download-binaries 会卡死），改为运行时按 ORT_DYLIB_PATH 加载 dll。
+# 必须用 `=` 精确锁定：Cargo 对 pre-release 的 caret 范围会把更高的 rc
+# 也算进来（写 "2.0.0-rc.9" 实际装到 rc.15）。
+# 另：rc.9 与它自动解析出的 ort-sys rc.10 不兼容（267 个函数指针类型错误），
+# 所以改用 rc.10 —— ort 与 ort-sys 同版本，匹配。
+ort = { version = "=2.0.0-rc.10", features = ["load-dynamic", "cuda"] }
+# RMVPE 的 mel 前处理需要 STFT；不引 azzer-dsp 是为了守住 L5 内部的分工
+# （推理层不该依赖 DSP 层的音频类型），算法本身只有几十行。
+rustfft.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tracing.workspace = true

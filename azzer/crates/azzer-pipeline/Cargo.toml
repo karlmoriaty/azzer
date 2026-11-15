@@ -1,0 +1,17 @@
+[package]
+name = "azzer-pipeline"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+azzer-core = { path = "../azzer-core" }
+azzer-dsp = { path = "../azzer-dsp" }
+# L4（调度）依赖 L5（引擎）是允许的方向。N05 在有 f0 模型时改走 RMVPE，
+# 没有就回落到 dsp 的自研双路——所以这两个依赖都是必需的。
+azzer-infer = { path = "../azzer-infer" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true

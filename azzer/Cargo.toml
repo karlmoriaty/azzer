@@ -1,0 +1,36 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/azzer-core",
+    "crates/azzer-dsp",
+    "crates/azzer-pipeline",
+    "crates/azzer-infer",
+    "crates/azzer-api",
+    "src-tauri",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.92"
+license = "MIT"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tracing = "0.1"
+sha2 = "0.10"
+rustfft = "6"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 2
