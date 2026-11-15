@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-labelledby="title">
+  <title id="title">Contour</title>
+  <!-- 03 · 三层等高线，芯是波形。用于「评估 / 全部展开」按钮。
+       原稿的环只占 viewBox 的一半宽、四分之一高，20px 下会糊成一团；
+       按钮版整体放大 1.5 倍并居中，描边同步加粗（9 × 1.5 = 13.5）。 -->
+  <g transform="translate(60 60) scale(1.5) translate(-60 -48.5)"
+     fill="none" stroke="#E8B27D" stroke-width="9" stroke-linecap="round">
+    <path d="M31 60 A29 29 0 1 1 89 60" opacity="0.55"/>
+    <path d="M43 60 A17 17 0 1 1 77 60" opacity="0.8"/>
+    <path d="M51 60 Q55 54 59 60 T67 60 T73 60"/>
+  </g>
+</svg>

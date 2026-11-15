@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-labelledby="title">
+  <title id="title">Source to Target</title>
+  <!-- 04 · 一个点是源，一个点是成品，中间连着的必须是波形。用于「换一条 / 回到源」按钮。 -->
+  <circle cx="24" cy="60" r="10" fill="#5EC8B0"/>
+  <circle cx="96" cy="60" r="10" fill="#E8B27D"/>
+  <path d="M24 60 Q40 38 60 60 T96 60"
+        fill="none" stroke="#E8B27D" stroke-width="7" stroke-linecap="round"/>
+</svg>

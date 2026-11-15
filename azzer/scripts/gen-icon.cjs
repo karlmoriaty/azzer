@@ -3,8 +3,9 @@
 // 为什么不引 sharp/canvas：本机没有这些原生依赖，且在 Windows 上编译很麻烦。
 // 图标是纯几何图形，手写 PNG 编码（含 zlib 压缩与 CRC32）就够了，零依赖。
 //
-// 图形：深色圆角方块 + 暖石色波形（五根竖条，中间最高）。
-// 这既是品牌标识，也点明产品是音频工具。
+// 图形：深色圆角方块 + 品牌主标 01（A / Waveform）。
+// 路径与 design/brand/azzer-mark.svg 是同一组数据，改标识时两边必须同步。
+// 用「点到线段距离」把描边栅格化，天然带圆头，且 1px 内做覆盖度抗锯齿。
 //
 // 用法：node scripts/gen-icon.cjs
 
@@ -71,23 +72,71 @@ function encodePng(width, height, rgba) {
 const BG = [0x0c, 0x0c, 0x0d, 255];
 const ACCENT = [0xe8, 0xb2, 0x7d, 255];
 
+// 品牌主标 01，与 design/brand/azzer-mark.svg 同源（120×120 坐标系）：
+//   A 两笔   M27 94 L60 24 L93 94        描边 7
+//   波形横杠 M43 70 Q48 64 53 70 T63 70 T73 70   描边 5
+const A_LEGS = [
+  [27, 94, 60, 24],
+  [60, 24, 93, 94],
+];
+
+/** 采样一段二次贝塞尔。SVG 的 T 命令把上一段控制点关于终点作镜像。 */
+function quad(p0, c, p1, steps = 12) {
+  const pts = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const u = 1 - t;
+    pts.push([
+      u * u * p0[0] + 2 * u * t * c[0] + t * t * p1[0],
+      u * u * p0[1] + 2 * u * t * c[1] + t * t * p1[1],
+    ]);
+  }
+  return pts;
+}
+
+function buildWave() {
+  const p0 = [43, 70];
+  const c1 = [48, 64];
+  const p1 = [53, 70];
+  const c2 = [2 * p1[0] - c1[0], 2 * p1[1] - c1[1]]; // (58, 76)
+  const p2 = [63, 70];
+  const c3 = [2 * p2[0] - c2[0], 2 * p2[1] - c2[1]]; // (68, 64)
+  const p3 = [73, 70];
+  return [
+    ...quad(p0, c1, p1),
+    ...quad(p1, c2, p2).slice(1),
+    ...quad(p2, c3, p3).slice(1),
+  ];
+}
+
+const WAVE = buildWave();
+
+function distToSeg(px, py, ax, ay, bx, by) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const l2 = dx * dx + dy * dy;
+  let t = l2 === 0 ? 0 : ((px - ax) * dx + (py - ay) * dy) / l2;
+  t = t < 0 ? 0 : t > 1 ? 1 : t;
+  const qx = ax + t * dx - px;
+  const qy = ay + t * dy - py;
+  return Math.sqrt(qx * qx + qy * qy);
+}
+
 function draw(size) {
   const buf = Buffer.alloc(size * size * 4);
   const r = size * 0.22; // 圆角半径
-  const bars = 5;
-  const gapRatio = 0.06;
-  const barW = (size * 0.62) / bars;
-  const gap = size * gapRatio;
-  const totalW = bars * barW + (bars - 1) * gap;
-  const x0 = (size - totalW) / 2;
-  // 每根竖条的高度比例（中间最高，模拟波形）
-  const heights = [0.34, 0.62, 0.9, 0.55, 0.3];
-  const cy = size / 2;
+
+  // 主标在 120 空间里高 70，映射到图标高度的 68%，四周留白
+  const k = (size * 0.68) / 70;
+  const X = (x) => size / 2 + (x - 60) * k;
+  const Y = (y) => size / 2 + (y - 59) * k;
+  const halfA = 3.5 * k;
+  const halfW = 2.5 * k;
+  const legs = A_LEGS.map(([a, b, c, d]) => [X(a), Y(b), X(c), Y(d)]);
+  const wave = WAVE.map(([x, y]) => [X(x), Y(y)]);
 
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      const i = (y * size + x) * 4;
-
       // 圆角矩形外 → 透明
       const inCornerX = x < r ? r - x : x > size - 1 - r ? x - (size - 1 - r) : 0;
       const inCornerY = y < r ? r - y : y > size - 1 - r ? y - (size - 1 - r) : 0;
@@ -95,20 +144,26 @@ function draw(size) {
         if (inCornerX * inCornerX + inCornerY * inCornerY > r * r) continue;
       }
 
-      let color = BG;
+      const px = x + 0.5;
+      const py = y + 0.5;
+      let cov = 0;
 
-      for (let b = 0; b < bars; b++) {
-        const bx = x0 + b * (barW + gap);
-        if (x >= bx && x < bx + barW) {
-          const h = size * heights[b];
-          if (y >= cy - h / 2 && y <= cy + h / 2) color = ACCENT;
-        }
+      for (const [ax, ay, bx, by] of legs) {
+        const c = Math.min(1, Math.max(0, halfA + 0.5 - distToSeg(px, py, ax, ay, bx, by)));
+        if (c > cov) cov = c;
+      }
+      for (let i = 1; i < wave.length; i++) {
+        const [ax, ay] = wave[i - 1];
+        const [bx, by] = wave[i];
+        const c = Math.min(1, Math.max(0, halfW + 0.5 - distToSeg(px, py, ax, ay, bx, by)));
+        if (c > cov) cov = c;
       }
 
-      buf[i] = color[0];
-      buf[i + 1] = color[1];
-      buf[i + 2] = color[2];
-      buf[i + 3] = color[3];
+      const i = (y * size + x) * 4;
+      buf[i] = BG[0] + (ACCENT[0] - BG[0]) * cov;
+      buf[i + 1] = BG[1] + (ACCENT[1] - BG[1]) * cov;
+      buf[i + 2] = BG[2] + (ACCENT[2] - BG[2]) * cov;
+      buf[i + 3] = 255;
     }
   }
   return buf;

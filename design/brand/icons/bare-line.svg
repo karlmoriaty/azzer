@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-labelledby="title">
+  <title id="title">Bare Line</title>
+  <!-- 02 · 一条几乎平的线，中段有一点点起伏。用于「选择 WAV / 导入源」按钮。 -->
+  <path d="M12 60 L44 60 Q49 53 54 60 T64 60 Q69 67 74 60 L108 60"
+        fill="none" stroke="#E8B27D" stroke-width="9"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

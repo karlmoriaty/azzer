@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-labelledby="title">
+  <title id="title">Azzer</title>
+  <!-- 品牌主标 01 · A / Waveform。字母 A 的横杠换成一道波形。 -->
+  <g fill="none" stroke="#E8B27D" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M27 94 L60 24 L93 94" stroke-width="7"/>
+    <path d="M43 70 Q48 64 53 70 T63 70 T73 70" stroke-width="5"/>
+  </g>
+</svg>

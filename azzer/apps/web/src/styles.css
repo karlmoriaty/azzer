@@ -312,3 +312,60 @@ kbd {
   line-height: 1.7;
   padding: var(--s6) 0;
 }
+
+/* ---------- 品牌资产（见 design/brand/） ----------
+   01 只出现在顶栏；02/03/04 作为按钮图标，靠 currentColor 跟随按钮状态。 */
+
+.brand-mark {
+  display: inline-flex;
+  color: var(--accent-warm);
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  transition: background 120ms, border-color 120ms, color 120ms, opacity 120ms;
+}
+
+.icon-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--text-tertiary);
+  color: var(--text-primary);
+}
+
+.icon-btn:disabled {
+  opacity: 0.45;
+  cursor: progress;
+}
+
+.icon-btn.primary {
+  color: var(--accent-warm);
+  border-color: rgba(232, 178, 125, 0.35);
+  background: rgba(232, 178, 125, 0.08);
+}
+
+.icon-btn.primary:hover:not(:disabled) {
+  background: rgba(232, 178, 125, 0.16);
+  border-color: rgba(232, 178, 125, 0.55);
+  color: var(--accent-warm);
+}
+
+.icon-btn.sm {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.icon-btn .ico {
+  display: inline-flex;
+  color: inherit;
+  flex: none;
+}

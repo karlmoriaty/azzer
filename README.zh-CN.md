@@ -1,5 +1,9 @@
 # Azzer
 
+<p align="center">
+  <img src="./design/brand/azzer-mark-tile.svg" alt="Azzer 品牌标：横杠是波形的字母 A" width="88" height="88">
+</p>
+
 **把一条真人演唱，变成目标音色唱的、听不出是 AI 的、可发布的那一版。**
 
 <sub>English version: [README.md](./README.md)</sub>

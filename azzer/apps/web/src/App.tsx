@@ -10,6 +10,7 @@ import {
   type SystemInfo,
 } from "./api/client";
 import { Waveform } from "./features/waveform/Waveform";
+import { BrandMark, BareLineIcon, ContourIcon, SourceTargetIcon } from "./components/Brand";
 
 type Conn =
   | { kind: "loading" }
@@ -266,7 +267,10 @@ function Header({ conn }: { conn: Conn }) {
   const caps = conn.kind === "ok" ? conn.info : null;
   return (
     <header style={S.header}>
-      <div style={{ display: "flex", alignItems: "baseline", gap: "var(--s3)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--s3)" }}>
+        <span className="brand-mark" aria-hidden="true">
+          <BrandMark size={26} />
+        </span>
         <span style={S.brand}>Azzer</span>
         <span style={S.subtle}>同音色直通</span>
       </div>
@@ -356,6 +360,22 @@ function DropZone(props: {
             ? `${phase.name}（${(phase.size / 1_048_576).toFixed(1)}MB）`
             : "48kHz 或 44.1kHz｜单声道或双声道｜≤200MB｜≥3 秒"}
         </div>
+        <button
+          type="button"
+          className="icon-btn primary"
+          disabled={uploading}
+          style={{ marginTop: "var(--s4)" }}
+          onClick={(e) => {
+            // 外层 drop 区本身也可点击，不拦住会连开两次文件选择器
+            e.stopPropagation();
+            onPick();
+          }}
+        >
+          <span className="ico">
+            <BareLineIcon size={18} />
+          </span>
+          选择 WAV 文件
+        </button>
       </div>
 
       {failed && (
@@ -413,7 +433,10 @@ function Result(props: {
             {report.repair.de_reverb_applied ? "已去混响" : "跳过去混响"}
           </div>
         </div>
-        <button onClick={onReset} style={S.ghostBtn}>
+        <button type="button" className="icon-btn" onClick={onReset}>
+          <span className="ico">
+            <SourceTargetIcon size={18} />
+          </span>
           换一条
         </button>
       </div>
@@ -525,16 +548,33 @@ function EvalTable({ evalReport }: { evalReport: AEntryReport["eval"] }) {
   }, [evalReport.items]);
 
   const [open, setOpen] = useState<Record<string, boolean>>({ 母带: true, 拟真度: true });
+  const allOpen = groups.every(([group]) => open[group] ?? false);
+  const toggleAll = () => {
+    const next: Record<string, boolean> = {};
+    for (const [group] of groups) next[group] = !allOpen;
+    setOpen(next);
+  };
 
   return (
     <div style={{ display: "grid", gap: "var(--s3)" }}>
-      <div style={{ display: "flex", alignItems: "baseline", gap: "var(--s3)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--s3)", flexWrap: "wrap" }}>
         <span style={{ fontSize: 13, color: "var(--text-primary)" }}>评估</span>
         <span style={S.subtle}>
           {evalReport.items.length} 项｜{evalReport.measured} 项实测｜
           {evalReport.not_applicable} 项不适用
           {evalReport.failing.length > 0 && `｜${evalReport.failing.length} 项未达标`}
         </span>
+        <button
+          type="button"
+          className="icon-btn sm"
+          style={{ marginLeft: "auto" }}
+          onClick={toggleAll}
+        >
+          <span className="ico">
+            <ContourIcon size={20} />
+          </span>
+          {allOpen ? "全部收起" : "全部展开"}
+        </button>
       </div>
 
       {groups.map(([group, items]) => {
@@ -685,15 +725,5 @@ const S: Record<string, React.CSSProperties> = {
     fontFamily: "inherit",
     fontSize: 13,
     textAlign: "left",
-  },
-  ghostBtn: {
-    background: "transparent",
-    border: "1px solid var(--border-strong)",
-    borderRadius: "var(--r-pill)",
-    color: "var(--text-secondary)",
-    padding: "6px 14px",
-    fontSize: 12,
-    cursor: "pointer",
-    fontFamily: "inherit",
   },
 };

@@ -17,7 +17,7 @@
 | 4 | `azzer-api`：axum + token 鉴权 + 上传/轮询/取成品 | ✅ 8 个测试（含全链路回归）+ 端到端冒烟 |
 | 5 | 前端：Vite + React + Canvas 波形 + 双轨 A/B | ✅ 构建通过，Edge headless 10 项断言 |
 | 6 | `azzer-shell`（实际在 `src-tauri/`）：Tauri 壳 + `initialization_script` 注入 bridge | ⏳ 代码就绪，首次编译（300+ 依赖）未做 |
-| 7 | 图标（PNG + ICO，零依赖生成） | ✅ 32/128/256 + ico |
+| 7 | 图标（PNG + ICO，零依赖生成） | ✅ 32/128/256 + ico，图形与品牌主标 01 同源（`../design/brand/azzer-mark.svg`） |
 
 ### 本机关键约束（已实测）
 

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Azzer · Logo Studies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0A0B;
+    --surface: #111113;
+    --line: rgba(255,255,255,0.07);
+    --ink: #EDEDEF;
+    --ink-2: #8E8E96;
+    --ink-3: #55555C;
+    --warm: #E8B27D;
+    --cool: #5EC8B0;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Space Grotesk", "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 72px 40px 120px;
+    min-height: 100vh;
+  }
+
+  /* 背景：一层极淡的径向光晕，避免纯平 */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(900px 600px at 12% -10%, rgba(232,178,125,0.055), transparent 60%),
+      radial-gradient(700px 500px at 92% 8%, rgba(94,200,176,0.04), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; position: relative; z-index: 1; }
+
+  header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 28px;
+    margin-bottom: 64px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: 58px;
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+  h1 em { font-style: normal; color: var(--warm); }
+
+  header p {
+    max-width: 420px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink-2);
+    padding-bottom: 6px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .card {
+    background: var(--surface);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    animation: rise 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.13s; }
+  .card:nth-child(3) { animation-delay: 0.21s; }
+  .card:nth-child(4) { animation-delay: 0.29s; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .stage {
+    aspect-ratio: 4 / 3;
+    display: grid;
+    place-items: center;
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.014), transparent 55%);
+  }
+  .stage svg { width: 168px; height: 168px; }
+
+  .badge {
+    position: absolute;
+    top: 18px;
+    left: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--ink-3);
+  }
+
+  .badge.chosen {
+    color: var(--warm);
+    border: 1px solid rgba(232, 178, 125, 0.35);
+    background: rgba(232, 178, 125, 0.08);
+    border-radius: 999px;
+    padding: 3px 9px;
+    top: 14px;
+    left: 16px;
+  }
+
+  .badge.icon {
+    color: var(--cool);
+  }
+
+  .chosen-note {
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--warm);
+  }
+
+  .meta {
+    border-top: 1px solid var(--line);
+    padding: 22px 24px 26px;
+  }
+
+  .meta h2 {
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin-bottom: 7px;
+  }
+
+  .meta p {
+    font-size: 13.5px;
+    line-height: 1.62;
+    color: var(--ink-2);
+  }
+
+  /* 小尺寸与亮底测试 */
+  .probe {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed rgba(255,255,255,0.055);
+  }
+
+  .probe .mini {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    background: #000;
+    border-radius: 6px;
+  }
+  .probe .mini svg { width: 22px; height: 22px; }
+
+  .probe .light {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    background: #F4F2EF;
+    border-radius: 6px;
+  }
+  .probe .light svg { width: 22px; height: 22px; }
+
+  .probe span {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+
+  /* 推荐 */
+  .verdict {
+    margin-top: 1px;
+    border: 1px solid var(--line);
+    border-top: none;
+    padding: 44px 48px;
+    background: var(--surface);
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .verdict h2 {
+    font-size: 12px;
+    font-family: var(--mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--warm);
+    font-weight: 400;
+  }
+
+  .verdict p {
+    font-size: 15px;
+    line-height: 1.72;
+    color: var(--ink-2);
+    max-width: 640px;
+  }
+  .verdict p + p { margin-top: 14px; }
+  .verdict strong { color: var(--ink); font-weight: 500; }
+
+  footer {
+    margin-top: 56px;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 860px) {
+    body { padding: 44px 20px 80px; }
+    header { flex-direction: column; align-items: flex-start; gap: 20px; }
+    h1 { font-size: 40px; }
+    .grid { grid-template-columns: 1fr; }
+    .verdict { grid-template-columns: 1fr; gap: 20px; padding: 32px 24px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { opacity: 1; animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="eyebrow">Logo Studies · 2026-11</div>
+      <h1>Azzer<em>.</em></h1>
+    </div>
+    <p>四个方向，回答同一个问题：怎么用一个记号说清「我们只做减法」。01 定为品牌主标，02–04 落进按钮里。</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- 01 A / Waveform -->
+    <article class="card">
+      <div class="stage">
+        <div class="badge chosen">01 · 品牌主标</div>
+        <svg viewBox="0 0 120 120" aria-label="A 与波形">
+          <path d="M27 94 L60 24 L93 94"
+                fill="none" stroke="#E8B27D" stroke-width="7"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M43 70 Q48 64 53 70 T63 70 T73 70"
+                fill="none" stroke="#E8B27D" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <h2>A / Waveform</h2>
+        <p>字母 A 的横杠换成一道波形。最直白的一版：名字和它做的事在同一个笔画里。</p>
+        <div class="chosen-note">定稿 2026-11-15 · 品牌主标 → design/brand/azzer-mark.svg</div>
+        <div class="probe">
+          <div class="mini">
+            <svg viewBox="0 0 120 120">
+              <path d="M27 94 L60 24 L93 94" fill="none" stroke="#E8B27D" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M43 70 Q48 64 53 70 T63 70 T73 70" fill="none" stroke="#E8B27D" stroke-width="6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="light">
+            <svg viewBox="0 0 120 120">
+              <path d="M27 94 L60 24 L93 94" fill="none" stroke="#12100E" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M43 70 Q48 64 53 70 T63 70 T73 70" fill="none" stroke="#12100E" stroke-width="6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span>16px · 亮底</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 02 Bare Line -->
+    <article class="card">
+      <div class="stage">
+        <div class="badge icon">02 · 按钮图标</div>
+        <svg viewBox="0 0 120 120" aria-label="一条几乎平的线">
+          <path d="M12 60 L44 60 Q49 53 54 60 T64 60 Q69 67 74 60 L108 60"
+                fill="none" stroke="#E8B27D" stroke-width="5.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <h2>Bare Line</h2>
+        <p>一条几乎平直的线，中段有一点点起伏。全部含义都在那点起伏里：处理应该是平的，人是唯一不平的地方。</p>
+        <div class="probe">
+          <div class="mini">
+            <svg viewBox="0 0 120 120">
+              <path d="M12 60 L44 60 Q49 53 54 60 T64 60 Q69 67 74 60 L108 60" fill="none" stroke="#E8B27D" stroke-width="8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="light">
+            <svg viewBox="0 0 120 120">
+              <path d="M12 60 L44 60 Q49 53 54 60 T64 60 Q69 67 74 60 L108 60" fill="none" stroke="#12100E" stroke-width="8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span>16px · 亮底</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 03 Contour -->
+    <article class="card">
+      <div class="stage">
+        <div class="badge icon">03 · 按钮图标</div>
+        <svg viewBox="0 0 120 120" aria-label="等高线，芯是波形">
+          <path d="M31 60 A29 29 0 1 1 89 60"
+                fill="none" stroke="#E8B27D" stroke-width="5"
+                stroke-linecap="round" opacity="0.32"/>
+          <path d="M43 60 A17 17 0 1 1 77 60"
+                fill="none" stroke="#E8B27D" stroke-width="5"
+                stroke-linecap="round" opacity="0.62"/>
+          <path d="M51 60 Q55 54 59 60 T67 60 T73 60"
+                fill="none" stroke="#E8B27D" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <h2>Contour</h2>
+        <p>三层等高线，最里面那圈是波形。像指纹——剥到最深处，剩下的还是这个人自己的形状。</p>
+        <div class="probe">
+          <div class="mini">
+            <svg viewBox="0 0 120 120">
+              <path d="M31 60 A29 29 0 1 1 89 60" fill="none" stroke="#E8B27D" stroke-width="7" stroke-linecap="round" opacity="0.32"/>
+              <path d="M43 60 A17 17 0 1 1 77 60" fill="none" stroke="#E8B27D" stroke-width="7" stroke-linecap="round" opacity="0.62"/>
+              <path d="M51 60 Q55 54 59 60 T67 60 T73 60" fill="none" stroke="#E8B27D" stroke-width="7" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="light">
+            <svg viewBox="0 0 120 120">
+              <path d="M31 60 A29 29 0 1 1 89 60" fill="none" stroke="#12100E" stroke-width="7" stroke-linecap="round" opacity="0.32"/>
+              <path d="M43 60 A17 17 0 1 1 77 60" fill="none" stroke="#12100E" stroke-width="7" stroke-linecap="round" opacity="0.62"/>
+              <path d="M51 60 Q55 54 59 60 T67 60 T73 60" fill="none" stroke="#12100E" stroke-width="7" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span>16px · 亮底</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 04 Source → Target -->
+    <article class="card">
+      <div class="stage">
+        <div class="badge icon">04 · 按钮图标</div>
+        <svg viewBox="0 0 120 120" aria-label="两点一线">
+          <circle cx="24" cy="60" r="7.5" fill="#5EC8B0"/>
+          <circle cx="96" cy="60" r="7.5" fill="#E8B27D"/>
+          <path d="M24 60 Q40 38 60 60 T96 60"
+                fill="none" stroke="#E8B27D" stroke-width="4"
+                stroke-linecap="round" opacity="0.9"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <h2>Source → Target</h2>
+        <p>一个点是源，一个点是成品，中间连着的必须是那道波形——不能拉成直线，拉直就等于把人抹平了。</p>
+        <div class="probe">
+          <div class="mini">
+            <svg viewBox="0 0 120 120">
+              <circle cx="24" cy="60" r="10" fill="#5EC8B0"/>
+              <circle cx="96" cy="60" r="10" fill="#E8B27D"/>
+              <path d="M24 60 Q40 38 60 60 T96 60" fill="none" stroke="#E8B27D" stroke-width="6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="light">
+            <svg viewBox="0 0 120 120">
+              <circle cx="24" cy="60" r="10" fill="#1B7F6C"/>
+              <circle cx="96" cy="60" r="10" fill="#B8752E"/>
+              <path d="M24 60 Q40 38 60 60 T96 60" fill="none" stroke="#B8752E" stroke-width="6" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span>16px · 亮底</span>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <section class="verdict">
+    <h2>定稿 · 2026-11-15</h2>
+    <div>
+      <p><strong>设计师选了 01 A / Waveform 作品牌主标</strong>，覆盖了我原先主推 02 的判断。理由成立：01 辨识度最高，品牌位需要的是「一眼认得出、任何场景不误读」，而不是概念上更巧。02 那条线更像一句需要解释的旁白，放在按钮里比放在门面上合适。</p>
+      <p>01 已落到 <strong>design/brand/azzer-mark.svg</strong>，并派生亮底版、单色版、应用方块、favicon 与 Tauri 桌面图标；Web 顶栏与两份 README 都换成它。</p>
+      <p><strong>02 / 03 / 04 不作废，改作按钮图标</strong>：02 用在「选择 WAV 文件」，03 用在评估的「全部展开 / 收起」，04 用在「换一条」。三枚都在 <strong>design/brand/icons/</strong>，运行时版本在 <strong>apps/web/src/components/Brand.tsx</strong>，描边走 currentColor，颜色跟随按钮状态。</p>
+      <p>小尺寸实测结论：01 在 32px 桌面图标下仍清晰；02 在 16px 下是一条细线，靠按钮文字补足语义；<strong>03 原稿在 20px 下会糊成一团</strong>，按钮版整体放大 1.5 倍、描边加粗、外圈对比度提高，且不缩到 16px；04 的双色只在按钮里保留，单色印刷场景一律用 01 的单色版。</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Azzer · Logo Studies</span>
+    <span>Palette #E8B27D · #5EC8B0 · #0A0A0B</span>
+  </footer>
+
+</div>
+</body>
+</html>

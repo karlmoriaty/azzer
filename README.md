@@ -1,5 +1,9 @@
 # Azzer
 
+<p align="center">
+  <img src="./design/brand/azzer-mark-tile.svg" alt="Azzer brand mark: the letter A whose crossbar is a waveform" width="88" height="88">
+</p>
+
 **Turn a real vocal take into a release-ready track in a target voice — one that doesn't sound AI-made.**
 
 <sub>中文版见 [README.zh-CN.md](./README.zh-CN.md)</sub>

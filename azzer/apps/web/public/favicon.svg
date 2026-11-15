@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-labelledby="title">
+  <title id="title">Azzer</title>
+  <!-- 应用方块：自带深色底，亮色/暗色主题下都能读。用于 favicon、README、桌面图标。 -->
+  <rect x="0" y="0" width="120" height="120" rx="28" fill="#0C0C0D"/>
+  <g transform="translate(12 12) scale(0.8)" fill="none" stroke="#E8B27D" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M27 94 L60 24 L93 94" stroke-width="8.75"/>
+    <path d="M43 70 Q48 64 53 70 T63 70 T73 70" stroke-width="6.25"/>
+  </g>
+</svg>
