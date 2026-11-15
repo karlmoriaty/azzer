@@ -1,106 +1,108 @@
 # Azzer
 
-**把一条真人演唱，变成目标音色唱的、听不出是 AI 的、可发布的那一版。**
+**Turn a real vocal take into a release-ready track in a target voice — one that doesn't sound AI-made.**
 
-<sub>Turn a real vocal take into a release-ready track in a target voice — and let the models do nothing but keep it from getting damaged.</sub>
-
----
-
-## AI 翻唱为什么一听就假
-
-不是音色不像。今天的音色克隆已经能以假乱真。
-
-假的是**别的东西**：
-
-- 该换气的地方没有吸气声，唱完一整句脸不红气不喘
-- 每个音高都精确落在十二平均律的格子上，像钢琴，不像喉咙
-- 每个音的时值都掐得整齐，没有抢拍，也没有拖
-- 长音平得像直线，没有颤音，或者颤得机械
-- 一句唱完，房间瞬间安静——没有空间，没有尾巴，没有"人待在一个屋子里"的感觉
-
-这些缺陷有一个共同点：**它们不是"缺了什么高级特性"，而是"原本有的东西被弄丢了"**。
-
-一条真人录音里，气口、呼吸、口腔噪声、音准的微偏差、时值的弹性、颤音的不规则——这些东西**本来就在源里**。翻唱管线每多一道处理，就丢一点。
+<sub>中文版见 [README.zh-CN.md](./README.zh-CN.md)</sub>
 
 ---
 
-## 所以我们的做法是反的
+## Why AI covers sound fake
 
-大多数工具在问：怎么让 AI 生成的歌声更像人？
+It's not the timbre. Voice cloning got convincing a while ago.
 
-Azzer 问的是另一个问题：**怎么在一路处理之后，把源里那些"人的东西"保住？**
+What gives it away is everything *else*:
 
-这条判断推翻了整个设计：
+- No breath before the phrase. The singer finishes a 20-second line without inhaling.
+- Every pitch lands exactly on an equal-tempered grid line. It sounds like a keyboard, not a throat.
+- Every note has the same length. No rushing, no dragging.
+- Long notes are dead flat — no vibrato, or vibrato that pulses like a machine.
+- The room goes silent the instant the phrase ends. No space, no tail, no sense of a person in a room.
 
-| 常规思路 | Azzer |
+These have one thing in common: **nothing is missing that a better model could add. Something that was already there got destroyed.**
+
+A real recording carries breath, mouth noise, micro-detuning, timing elasticity, irregular vibrato. All of it is *in the source*. Every processing stage removes a little more of it.
+
+---
+
+## So we work backwards
+
+Most tools ask: how do we make generated singing sound more human?
+
+Azzer asks: **how do we keep the human parts from being lost?**
+
+That one question reshapes the design:
+
+| Common approach | Azzer |
 |---|---|
-| 用更强的模型生成更好的人声 | 用最少的处理保住源里的人声 |
-| 指标是"生成质量"，越高越好 | 指标是"与源相比偏离多少"，越少越好 |
-| 模型是主角 | **模型是配角**，只负责别把事情做坏 |
-| 目标：比真人唱得更好 | 目标：听不出这不是真人唱的 |
+| A stronger model generates better vocals | Minimal processing preserves the source vocals |
+| Metric: generation quality, higher is better | Metric: deviation from the source, lower is better |
+| The model is the star | **The model is a supporting actor** — its only job is to not break things |
+| Goal: sing better than the human | Goal: you can't tell it isn't the human |
 
-由此得到一个不太讨喜的结论：**这门生意不是音质军备竞赛**。
+This leads to an uncomfortable conclusion: **this is not a quality arms race.**
 
-整轨生成的模型（Suno 那类）在音质上结构性领先——它们内部有十几轨分离表示，还内置母带。我们从一条混好的成品里往外拆，那道分离损失是不可逆的。所以 Azzer 从不承诺"比 Suno 好听"。
+End-to-end generative models (the Suno class) are structurally ahead on fidelity — they hold internal stem representations and ship with a built-in mastering chain. We take a mixed, finished recording and pull it apart, and that separation loss is irreversible.
 
-它承诺的是另一件事：**保留这个人的唱法**。他的换气位置、他的咬字、他习惯性拖长的那半个音——这些东西只有源里有，重新生成的模型永远学不走。
+So Azzer never claims to sound better than Suno.
+
+What it claims is different: **it preserves how this person sings.** Where they breathe. How they shape consonants. That half-beat they always drag. Those things only exist in the source — a regenerating model can never learn them.
 
 ---
 
-## 三条入口，各有各的代价
+## Three entry points, three different costs
 
-| 入口 | 什么时候用 | 走什么路 | 拟真上限 | 成品感 |
+| Entry | When | Path | Vocal realism | Finished feel |
 |---|---|---|---|---|
-| **A · 直通** | 源音色≈目标（唱自己的歌） | 跳过换音色，只做修复 + 拟真化 + 母带 | **最高** | 看伴奏 |
-| **B · 换音色** | 源是干声或清唱 | 分离 → 修复 → 换音色 → 拟真化 | 高 | 看伴奏 |
-| **C · 成品翻唱** | 源是发行成品（带伴奏） | 集成分离 → 修复 → 换音色 → 拟真化 | 中（分离损失不可逆） | **最高**（继承原编曲） |
+| **A · Direct** | Source timbre ≈ target (singing your own song) | Skip conversion; repair + humanize + master | **Highest** | Depends on backing |
+| **B · Convert** | Source is a dry or a cappella take | Separate → repair → convert → humanize | High | Depends on backing |
+| **C · Cover** | Source is a released track (with backing) | Integrated separate → repair → convert → humanize | Medium (separation loss is irreversible) | **Highest** (inherits the original arrangement) |
 
-注意 A 与 C 是**反向**的：C 的人声最不真，但整首成品感可能最好，因为伴奏是原版商业编曲。
+Note that A and C move in **opposite** directions: C has the weakest vocal realism but potentially the best finished feel, because the backing is the original commercial arrangement.
 
-这是两个独立维度，不能合成一句"好不好"。任何把它压成一个分数的做法，都是在骗人。
-
----
-
-## 它怎么工作
-
-一条演唱进来，经过 16 个节点：
-
-```
-N01 归一化 → N02 分级 ─┬─→ N03 分离 → N04 融合 ─┐
-                       │                        ├─→ N06 前处理 → N07 换音色 → N08 门禁
-                       └─→ N05 基频 ───────────┘
-                                                  ↓
-        N09 修复 → N10 呼吸重挂 → N11 humanize → N12 空间感 → N13 叠层 → N14 混音
-                                                  ↓
-                                    N15 母带 → N16 37 项评估
-```
-
-每个节点有五件东西写死在契约里：**输入 / 输出 / 契约断言 / 失败回退 / 幂等键**。
-
-幂等键是 `sha256(上游产物 + 参数 + 引擎版本 + adapter_hash)`。这意味着改一个 humanize 参数，只会重跑最后 5 个节点——**30 秒**，而不是从头 11 分钟。这是调参效率的全部来源。
-
-分六层，依赖方向单向向下：
-
-```
-L1 体验宿主（Tauri + React）
-L2 编排（axum，唯一入口）
-L3 计划（Song IR，唯一权威）
-L4 调度（节点 DAG，不许直接 use ort）
-L5 引擎（DSP / ONNX 推理）
-L6 资产（内容寻址存储）
-```
-
-`scripts/check-layering.cjs` 会检查这条线。因为"L4 偷偷 import 推理库"这种事，编译是不会报错的。
+These are two independent axes. Collapsing them into a single "how good is it" score would be a lie.
 
 ---
 
-## 模型：不内置、不下载、不托管
+## How it works
 
-这是硬性约束，不是设计偏好。
+A take goes through 16 nodes:
 
-软件本体**不含任何模型权重**，安装包、仓库、编译产物里都没有。启动时不检查"必需模型是否存在"，缺模型是**正常状态**。也没有自动下载，没有模型仓库 URL。
+```
+N01 normalize → N02 grade ─┬─→ N03 separate → N04 merge ─┐
+                           │                             ├─→ N06 pre → N07 convert → N08 gate
+                           └─→ N05 f0 ──────────────────┘
+                                                          ↓
+      N09 repair → N10 rebreath → N11 humanize → N12 space → N13 layers → N14 mix
+                                                          ↓
+                                        N15 master → N16 37-metric evaluation
+```
 
-模型路径由你自己在运行根目录的 `models.json` 里声明：
+Every node has five things fixed in its contract: **inputs / outputs / contract assertions / fallback / idempotency key**.
+
+The idempotency key is `sha256(upstream artifact + params + engine version + adapter_hash)`. Change one humanize parameter and only the last five nodes rerun — **30 seconds** instead of 11 minutes from scratch. That is where all the tuning speed comes from.
+
+Six layers, dependencies pointing one way:
+
+```
+L1  Experience host   (Tauri + React)
+L2  Orchestration     (axum, single entry)
+L3  Planning          (Song IR, single authority)
+L4  Scheduling        (node DAG — forbidden to `use ort` directly)
+L5  Engines           (DSP / ONNX inference)
+L6  Assets            (content-addressed storage)
+```
+
+`scripts/check-layering.cjs` enforces that line, because "L4 quietly imports the inference SDK" compiles just fine.
+
+---
+
+## Models: not bundled, not downloaded, not hosted
+
+This is a hard constraint, not a preference.
+
+The software ships **zero model weights** — not in the installer, not in this repo, not in build artifacts. Startup never checks whether a "required model" exists; a missing model is a **normal state**. There is no auto-download and no model registry URL.
+
+You declare paths yourself in `models.json` at the run root:
 
 ```json
 {
@@ -111,145 +113,143 @@ L6 资产（内容寻址存储）
 }
 ```
 
-不写这个文件？完全没问题——A 入口照样跑，用内置算法。
+No such file? Fine. Entry A still runs on the built-in algorithms.
 
-**为什么这么设计**：本机所有开源语音模型都是残缺、不完美的，把它们固化进产品等于把缺陷固化进产品。而且模型会换代，软件不该跟着换代。
+**Why**: every open-source voice model available is incomplete in some way. Baking one into a product bakes its defects into the product. And models get replaced; the software shouldn't.
 
-代价是用户要自己准备模型。我们接受这个代价。
+The cost is that you have to supply models yourself. We accept that cost.
 
 ---
 
-## 我们不打 Suno
+## We don't compete with Suno
 
-这张表是这个项目最有价值的东西之一——它写在一份不允许对外吹牛的文档里：
+This table lives in an internal document that forbids marketing language:
 
-| 维度 | Suno（2026-11 核对） | Azzer | 判定 |
+| Dimension | Suno (checked 2026-11) | Azzer | Verdict |
 |---|---|---|---|
-| 音色克隆 | 云端，需验证，部分地区不可用 | 本地，模型归你，可迁移 | **胜**（胜在归属） |
-| 保留原演绎 | Cover 是重新演绎，phrasing 会变 | 保留源全部音高/时值/气口 | **胜**（结构性） |
-| 局部编辑 | 段落级重生成 | 音符级 patch | **胜** |
-| 离线 / 数据归属 | 云端 | 全本地 | **胜** |
-| 分轨 | 12 轨模型内部表示 | 信号级分离 | 负 |
-| 整体音质 / 母带 | 整轨生成 + 内置母带 | 拆干声重建 + 自建母带链 | 负 |
-| 中文咬字 | 主流语种强 | 依赖源，待实测 | 负（待测） |
-| 出歌速度 | <1 分钟 2 首 | 2–4 分钟 | 负（数量级） |
+| Voice cloning | Cloud, verification required, unavailable in some regions | Local, model is yours, portable | **Win** (ownership) |
+| Preserving the performance | Cover re-performs; phrasing changes | Keeps the source's pitch, timing, breaths | **Win** (structural) |
+| Local editing | Section-level regeneration | Note-level patches | **Win** |
+| Offline / data ownership | Cloud | Fully local | **Win** |
+| Stem separation | Internal stem representations | Signal-level separation | Loss |
+| Overall fidelity / mastering | End-to-end generation + built-in mastering | Rebuilt from separated dry vocals + our own chain | Loss |
+| Mandarin articulation | Strong on its main languages | Inherits the source; untested | Loss (untested) |
+| Time to output | <1 min for 2 tracks | 2–4 min | Loss (order of magnitude) |
 
-文档里明确写着**禁止表述**："不得说效果超越 Suno、达到商业发行水准。"
-
-四胜、三负、一待测。这就是真实位置。
+Four wins, three losses, one untested. That's the real position.
 
 ---
 
-## 怎么算做成了
+## How we know it works
 
-**只有一个验收标准**：真人判别测试。
+**There is exactly one acceptance criterion**: a human detection test.
 
-20 组三元组（真人原唱 / Azzer 输出 / Suno 同条件输出，随机排列）× 30 位听测者 = 600 次判断。
+20 triads (real original / Azzer output / Suno output under the same conditions, shuffled) × 30 listeners = 600 judgments.
 
-通过线：
+Pass line:
 
-- Azzer 的识破率 **≤ 40%**
-- 且 ≤ 同条件下 Suno 输出识破率 × 1.1
+- Azzer detection rate **≤ 40%**
+- and ≤ Suno's detection rate × 1.1
 
-三选一的随机基线是 33.3%。
+The random baseline for a 3-way choice is 33.3%.
 
-其余 37 项指标（响度、真峰值、LRA、HNR、SECS……）都是它的**解释变量**——不达标时用来定位是哪个环节拖后腿，而不是用来自我安慰。
+The other 37 metrics (loudness, true peak, LRA, HNR, SECS…) are **explanatory variables** — used to locate which stage is dragging when a number is bad, not to comfort ourselves.
 
-**这个测试一次都还没跑。** 因为构造三元组需要 C 入口（从成品里拆人声、换音色、重混），而 C 入口还不存在。
+**This test has never been run.** Building the triads requires entry C (separate a finished track, convert, remix), and entry C doesn't exist yet.
 
-所以现在连"能不能达到目标"都还没有证据。这是这个项目最诚实的现状。
+Which means there is currently no evidence that the target is even reachable. That is the most honest statement about this project.
 
 ---
 
-## 现在到哪了
+## Where it stands
 
-**16 个节点实现了 6 个**：N01 归一化 / N02 分级 / N05 基频 / N09 修复 / N15 母带 / N16 评估。
+**Six of sixteen nodes implemented**: N01 normalize / N02 grade / N05 f0 / N09 repair / N15 master / N16 evaluation.
 
-三条入口里，**A 入口全链打通**。
+Of the three entries, **A is wired end-to-end**.
 
-实测（4.4 分钟真实人声，44.1kHz/16bit）：
+Measured on a 4.4-minute real vocal take (44.1 kHz / 16-bit):
 
-| 项 | 结果 |
+| Item | Result |
 |---|---|
-| 端到端耗时 | 2–4 分钟（视是否启用模型） |
-| 母带输出 | **−14.00 LUFS / −1.10 dBTP**，1 轮达标 |
-| 评估覆盖 | 37 项里 10 项有实测值，27 项标注"需要什么才能算" |
-| Rust 测试 | **142 个** |
-| 数值交叉验证 | Python 独立实现 vs Rust，7 项全 PASS，最大偏差 **7.6e-07** |
+| End-to-end time | 2–4 min (depending on whether a model is enabled) |
+| Master output | **−14.00 LUFS / −1.10 dBTP**, on target in one pass |
+| Evaluation coverage | 10 of 37 metrics measured; 27 explicitly state what they'd need |
+| Rust tests | **142** |
+| Numerical cross-check | Independent Python implementation vs Rust: 7/7 pass, max deviation **7.6e-07** |
 
-基频这一块做了两档：
+Pitch extraction has two tiers:
 
-| 指标 | 内置算法（零模型） | 可选 RMVPE |
+| Metric | Built-in (zero model) | Optional RMVPE |
 |---|---|---|
-| 中位 f0 | 108.5 Hz | **173.5 Hz** |
-| 八度错误率 | 8.1% | **4.6%** |
-| 与 Python 参考实现偏差 | — | **1.2%** |
+| Median f0 | 108.5 Hz | **173.5 Hz** |
+| Octave error rate | 8.1% | **4.6%** |
+| Deviation from Python reference | — | **1.2%** |
 
-RMVPE 是纯 Rust 移植（htk mel 滤波器组 + STFT + 解码），不依赖 Python。
+RMVPE is a pure-Rust port (htk mel filterbank + STFT + decoding). No Python at runtime.
 
-**没做的**：N03/N04 分离、N06–N08 换音色、N10–N14 拟真化、桌面壳首次编译、波形编辑器。
+**Not built yet**: N03/N04 separation, N06–N08 conversion, N10–N14 humanization, first successful Tauri build, waveform editor.
 
-有 8 个 issue 记录了这些缺口，每条都带实测数据、参数、参考实现位置和验收标准——**接手不用重新摸底**。
+Eight issues track these gaps. Each carries measured data, parameters, reference implementation locations and acceptance criteria — **a new contributor doesn't start from zero.**
 
 ---
 
-## 跑起来
+## Running it
 
-需要 Rust 1.92+ 与一个能用的 C++ 链接器。
+Requires Rust 1.92+ and a working C++ linker.
 
 ```powershell
-# 编译
+# Build
 node azzer/scripts/cargo-run.cjs build
 
-# 测试（142 个）
+# Test (142)
 node azzer/scripts/cargo-run.cjs test
 
-# 对任意一条人声跑完整 A 入口，并判读"这条源现在能算出什么"
+# Run the full A entry on any vocal take and see what this source can produce
 node azzer/scripts/check-source.cjs D:\path\to\vocal.wav
 ```
 
-最后那条会告诉你：37 项里有几项算得出、几项不适用、HumanizeScore 缺哪个子项。换真实素材时用它，别手敲命令行。
+The last one tells you how many of the 37 metrics are computable, which are inapplicable, and which HumanizeScore sub-item is missing. Use it on real material instead of typing command lines by hand.
 
-想要 GPU：`azzer/scripts/fetch-cuda.ps1` 会把 CUDA 与 cuDNN 的 DLL 解到 `native/`，运行时前置到进程 PATH。不装驱动、不改注册表、不设永久环境变量。
+For GPU: `azzer/scripts/fetch-cuda.ps1` unpacks CUDA and cuDNN DLLs into `native/` and prepends it to the process PATH at runtime. No driver install, no registry edits, no permanent environment variables.
 
 ---
 
-## 这个仓库里有什么
+## What's in here
 
 ```
-azzer/            Rust 工作区（7645 行，33 个文件）
+azzer/            Rust workspace (7,645 lines across 33 files)
 ├── crates/
-│   ├── azzer-core/      16 节点契约、幂等键、内容寻址、模型注册
-│   ├── azzer-dsp/       解码/重采样/STFT/f0/修复/母带/感知/37 项评估
-│   ├── azzer-pipeline/  节点实现与 A 入口 CLI
+│   ├── azzer-core/      16-node contracts, idempotency keys, CAS, model registry
+│   ├── azzer-dsp/       decode / resample / STFT / f0 / repair / master / percept / 37 metrics
+│   ├── azzer-pipeline/  node implementations and the A-entry CLI
 │   ├── azzer-infer/     ONNX Runtime + RMVPE
-│   └── azzer-api/       axum + token 鉴权
-├── apps/web/            React 前端（Vite + 自研 Canvas 波形）
-├── src-tauri/           Tauri 壳（代码就绪，未编译）
-└── scripts/             构建、检查、端到端、素材判读
+│   └── azzer-api/       axum + token auth
+├── apps/web/            React frontend (Vite + hand-rolled Canvas waveform)
+├── src-tauri/           Tauri shell (code ready, never compiled)
+└── scripts/             build, checks, e2e, source inspection
 
-docs/             设计文档（[索引](./docs/README.md)）：产品总案、技术栈定稿、六份详细设计参考
+docs/             Design documents ([index](./docs/README.md)) — product plan, tech stack, six detailed references
 ```
 
-**不含模型权重**。需要时按各模型自己的许可自行获取，路径在 `models.json` 里声明。
+**No model weights.** Get them under their own licenses and declare the paths in `models.json`.
 
 ---
 
-## 参与
+## Contributing
 
-这个项目现在最缺的不是代码，是两样东西：
+What this project lacks is not code. It lacks two things:
 
-1. **一条真实的"人声+伴奏"混音素材**（30 秒到 1 分钟，版权清晰）——现在只有纯人声轨，验证不了分离质量
-2. **30 位听测者**——唯一的验收标准需要真人判断，这一项没有任何技术替代
+1. **One real "vocal + backing" mix** (30 s to 1 min, clean rights) — right now there's only an isolated vocal track, so separation quality can't be validated
+2. **30 listeners** — the only acceptance criterion needs human judgment; there is no technical substitute for it
 
-其余工作都拆成了 issue，按里程碑标注，带技术细节。
+Everything else is filed as an issue, tagged by milestone, with technical detail attached.
 
-如果你也对"保住人的东西"这件事感兴趣，欢迎从任意一条 issue 开始。
+If "keep the human parts intact" is a problem you find interesting, pick any issue and start.
 
 ---
 
-## 一句话总结
+## One sentence
 
-**这不是一个生成人声的项目，是一个不把人声弄丢的项目。**
+**Azzer doesn't generate a voice. It refuses to lose one.**
 
-区别在于：前者追求更好，后者要求更少。
+One aims for better. The other aims for less loss.
